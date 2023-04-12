@@ -5,9 +5,12 @@ class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
+      firstname: '',
+      lastname: '',
       email: '',
-      password: ''
+      password: '',
+      shippingaddress: '',
+      creditcard: ''
     };
   }
 
@@ -18,8 +21,8 @@ class Register extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { username, email, password } = this.state;
-    axios.post('/register', { username, email, password })
+    const { firstname, lastname, email, password, shippingaddress, creditcard } = this.state;
+    axios.post('/register', { firstname, lastname, email, password, shippingaddress, creditcard })
       .then((response) => {
         console.log(response.data);
       })
@@ -29,14 +32,19 @@ class Register extends Component {
   };
 
   render() {
-    const { username, email, password } = this.state;
+    const { firstname, lastname, email, password, shippingaddress, creditcard } = this.state;
     return (
       <div>
         <h2>Register</h2>
         <form onSubmit={this.handleSubmit}>
           <label>
-            Username:
-            <input type="text" name="username" value={username} onChange={this.handleInputChange} />
+            First Name:
+            <input type="text" name="firstname" value={firstname} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Last Name:
+            <input type="text" name="lastname" value={lastname} onChange={this.handleInputChange} />
           </label>
           <br />
           <label>
@@ -47,6 +55,16 @@ class Register extends Component {
           <label>
             Password:
             <input type="password" name="password" value={password} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Shipping Address:
+            <input type="text" name="shippingaddress" value={shippingaddress} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Credit Card:
+            <input type="number" name="creditcard" value={creditcard} onChange={this.handleInputChange} />
           </label>
           <br />
           <button type="submit">Register</button>

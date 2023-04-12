@@ -1,0 +1,38 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const AddToCart = () => {
+  const [inventoryId, setInventoryId] = useState('');
+  const [quantity, setQuantity] = useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const { data } = await axios.post('/addItemToCart', { inventory_id: inventoryId, quantity });
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Add Item to Cart</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Inventory ID:
+          <input type="text" value={inventoryId} onChange={(event) => setInventoryId(event.target.value)} />
+        </label>
+        <br />
+        <label>
+          Quantity:
+          <input type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} />
+        </label>
+        <br />
+        <button type="submit">Add to Cart</button>
+      </form>
+    </div>
+  );
+};
+
+export default AddToCart;
