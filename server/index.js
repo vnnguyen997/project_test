@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const { Client } = require('pg');
 const cors = require("cors");
 const session = require('express-session');
-const store = new session.MemoryStore();
+const cookieParser = require('cookie-parser');
+const pgSession = require('connect-pg-simple')(session);
 
 const app = express();
 const port = 3000;
@@ -27,11 +28,15 @@ const sessionConfig = {
   cookie: {
     maxAge: 600000, // Session duration in milliseconds (30 days in this case)
   },
-  store
+  store: new pgSession({
+    pool: client, // Postgres client instance
+    tableName: 'session' // Table name to store sessions
+  })
 };
 
 // Configure middleware
 app.use(session(sessionConfig));
+app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
 
