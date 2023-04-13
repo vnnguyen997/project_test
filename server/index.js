@@ -1710,6 +1710,18 @@ app.post('/createInventory', async (req, res) => {
   }
 });
 
+// endpoint to get specific item by id
+app.get('/findItemById', async (req, res) => {
+  try {
+    const inventory_id = req.body.inventory_id;
+    const item = await InventoryModel.findByID(inventory_id);
+    res.status(200).json({ item });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // endpoint to display inventory
 app.get('/displayInventory', async (req, res) => {
   try {
