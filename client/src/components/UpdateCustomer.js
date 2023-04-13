@@ -10,7 +10,10 @@ class UpdateCustomer extends Component {
       email: '',
       password: '',
       shippingaddress: '',
-      creditcard: ''
+      creditcard: '',
+      cvv: '',
+      expirationdate: '',
+      billingaddress: '',
     };
   }
 
@@ -21,13 +24,16 @@ class UpdateCustomer extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { firstname, lastname, email, password, shippingaddress, creditcard } = this.state;
+    const { firstname, lastname, email, password, shippingaddress, creditcard, cvv, expirationdate, billingaddress } = this.state;
     axios.put(`/updateCustomer/${email}`, {
       firstname,
       lastname,
       password,
       shippingaddress,
-      creditcard
+      creditcard,
+      cvv,
+      expirationdate,
+      billingaddress
     })
       .then((response) => {
         console.log(response.data);
@@ -38,7 +44,7 @@ class UpdateCustomer extends Component {
   };
 
   render() {
-    const { firstname, lastname, email, password, shippingaddress, creditcard } = this.state;
+    const { firstname, lastname, email, password, shippingaddress, creditcard, cvv, expirationdate, billingaddress } = this.state;
     return (
       <div>
         <h2>UpdateCustomer</h2>
@@ -71,6 +77,21 @@ class UpdateCustomer extends Component {
           <label>
             Credit Card:
             <input type="number" name="creditcard" value={creditcard} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            CVV:
+            <input type="number" name="cvv" value={cvv} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Expiration Date:
+            <input type="text" name="expirationdate" value={expirationdate} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Billing Address:
+            <input type="text" name="billingaddress" value={billingaddress} onChange={this.handleInputChange} />
           </label>
           <br />
           <button type="submit">UpdateCustomer</button>
