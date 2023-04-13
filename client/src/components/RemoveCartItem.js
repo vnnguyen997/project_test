@@ -5,6 +5,7 @@ class RemoveCartItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      customer_id: '',
       inventory_id: ''
     };
   }
@@ -16,8 +17,8 @@ class RemoveCartItem extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { inventory_id } = this.state;
-    axios.delete(`/removeCartItem?inventory_id=${inventory_id}`)
+    const { customer_id, inventory_id } = this.state;
+    axios.delete(`/removeCartItem?customer_id=${customer_id}&inventory_id=${inventory_id}`)
       .then((response) => {
         console.log(response.data);
       })
@@ -27,11 +28,16 @@ class RemoveCartItem extends Component {
   };
 
   render() {
-    const { inventory_id } = this.state;
+    const { customer_id, inventory_id } = this.state;
     return (
       <div>
         <h2>Remove Cart Item</h2>
         <form onSubmit={this.handleSubmit}>
+          <label>
+            Customer ID:
+            <input type="text" name="customer_id" value={customer_id} onChange={this.handleInputChange} />
+          </label>
+          <br />
           <label>
             Inventory ID:
             <input type="text" name="inventory_id" value={inventory_id} onChange={this.handleInputChange} />

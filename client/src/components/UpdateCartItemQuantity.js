@@ -5,6 +5,7 @@ class UpdateCartItemQuantity extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      customer_id: '',
       inventory_id: '',
       quantity: ''
     };
@@ -17,8 +18,9 @@ class UpdateCartItemQuantity extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { inventory_id, quantity } = this.state;
+    const { customer_id, inventory_id, quantity } = this.state;
     axios.put(`/updateCartItemQuantity`, {
+      customer_id,
       inventory_id,
       newQuantity: quantity
     })
@@ -31,11 +33,16 @@ class UpdateCartItemQuantity extends Component {
   };
   
   render() {
-    const { inventory_id, quantity } = this.state;
+    const { customer_id, inventory_id, quantity } = this.state;
     return (
       <div>
         <h2>Update Cart Item Quantity</h2>
         <form onSubmit={this.handleSubmit}>
+          <label>
+            Customer ID:
+            <input type="text" name="customer_id" value={customer_id} onChange={this.handleInputChange} />
+          </label>
+          <br />
           <label>
             Inventory ID:
             <input type="text" name="inventory_id" value={inventory_id} onChange={this.handleInputChange} />
