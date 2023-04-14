@@ -21,6 +21,7 @@ import AddToCart from './components/AddToCart';
 import RemoveCartItem from './components/RemoveCartItem';
 import UpdateCartItemQuantity from './components/UpdateCartItemQuantity';
 import CheckoutButton from './components/CheckoutButton';
+import DisplayShoppingCartItems from './components/DisplayShoppingCartItems';
 
 
 const App = () => {
@@ -47,6 +48,7 @@ const App = () => {
       <RemoveCartItem />
       <UpdateCartItemQuantity />
       <CheckoutButton />
+      <DisplayShoppingCartItems />
 
     
     </div>
