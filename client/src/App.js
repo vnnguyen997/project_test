@@ -22,6 +22,8 @@ import RemoveCartItem from './components/RemoveCartItem';
 import UpdateCartItemQuantity from './components/UpdateCartItemQuantity';
 import CheckoutButton from './components/CheckoutButton';
 import DisplayShoppingCartItems from './components/DisplayShoppingCartItems';
+import DisplayOrderByCustomerID from './components/DisplayOrderByCustomerID';
+import DisplayOrderItems from './components/DisplayOrderItems';
 
 
 const App = () => {
@@ -49,6 +51,8 @@ const App = () => {
       <UpdateCartItemQuantity />
       <CheckoutButton />
       <DisplayShoppingCartItems />
+      <DisplayOrderByCustomerID />
+      <DisplayOrderItems />
 
     
     </div>
