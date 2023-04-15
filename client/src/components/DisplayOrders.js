@@ -22,6 +22,8 @@ function DisplayOrders() {
             <th>Creation Date</th>
             <th>Status</th>
             <th>Delivery Date</th>
+            <th>Customer ID</th>
+            <th>Shipping Method</th>
           </tr>
         </thead>
         <tbody>
@@ -31,6 +33,8 @@ function DisplayOrders() {
               <td>{order.creationdate}</td>
               <td>{order.status}</td>
               <td>{order.deliverydate}</td>
+              <td>{order.customer_id}</td>
+              <td>{order.shipping_method}</td>
             </tr>
           ))}
         </tbody>

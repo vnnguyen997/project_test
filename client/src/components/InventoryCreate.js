@@ -11,7 +11,8 @@ class InventoryCreate extends Component {
       price: '',
       itemgroup: '',
       stock: '',
-      image: ''
+      image: '',
+      warehouse: ''
     };
   };
 
@@ -22,8 +23,8 @@ class InventoryCreate extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { name, description, weight, price, itemgroup, stock, image} = this.state;
-    axios.post('/createInventory', { name, description, weight, price, itemgroup, stock, image})
+    const { name, description, weight, price, itemgroup, stock, image, warehouse } = this.state;
+    axios.post('/createInventory', { name, description, weight, price, itemgroup, stock, image, warehouse })
       .then((response) => {
         console.log(response.data);
       })
@@ -33,7 +34,7 @@ class InventoryCreate extends Component {
   };
 
   render() {
-    const { name, description, weight, price, itemgroup, stock, image} = this.state;
+    const { name, description, weight, price, itemgroup, stock, image, warehouse} = this.state;
     return (
       <div>
         <h2>Create Inventory</h2>
@@ -78,6 +79,11 @@ class InventoryCreate extends Component {
             <input type="text" name="image" value={image} onChange={this.handleInputChange} />
           </label>
           <br/>
+          <label>
+            Warehouse:
+            <input type="text" name="warehouse" value={warehouse} onChange={this.handleInputChange} />
+          </label>
+          <br />
           <button type="submit">Create Inventory</button>
         </form>
       </div>

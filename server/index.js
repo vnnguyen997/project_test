@@ -571,8 +571,8 @@ const InventoryModel = {
     try {
       // Insert new item
       const insertQuery = {
-        text: 'INSERT INTO inventory(name, description, weight, price, itemgroup, stock, image) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-        values: [item.name, item.description, item.weight, item.price, item.itemgroup, item.stock, item.image],
+        text: 'INSERT INTO inventory(name, description, weight, price, itemgroup, stock, image, warehouse) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        values: [item.name, item.description, item.weight, item.price, item.itemgroup, item.stock, item.image, item.warehouse],
       };
       const { rows } = await client.query(insertQuery);
       console.log(rows[0]);
@@ -618,7 +618,7 @@ const InventoryModel = {
   
       // Update the inventory fields with the new values, or keep the old value if the field is not provided
       const updateQuery = {
-        text: 'UPDATE inventory SET name = $1, description = $2, weight = $3, price = $4, itemgroup = $5, stock = $6 , image = $7 WHERE inventory_id = $8 RETURNING *',
+        text: 'UPDATE inventory SET name = $1, description = $2, weight = $3, price = $4, itemgroup = $5, stock = $6 , image = $7, warehouse = $8 WHERE inventory_id = $9 RETURNING *',
         values: [
           updateFields.name || inventory.rows[0].name,
           updateFields.description || inventory.rows[0].description,
@@ -627,6 +627,7 @@ const InventoryModel = {
           updateFields.itemgroup || inventory.rows[0].itemgroup,
           updateFields.stock || inventory.rows[0].stock,
           updateFields.image || inventory.rows[0].image,
+          updateFields.warehouse || inventory.rows[0].warehouse,
           inventory_id,
         ],
       };
@@ -930,6 +931,23 @@ const ShoppingCartItemModel = {
     return rows[0];
   },
 
+  // Get shopping cart items cart_id
+  async getCartID(customer_id) {
+    try {
+      const query = {
+        text: 'SELECT id FROM shopping_cart WHERE customer_id = $1',
+        values: [customer_id]
+      };
+      const { rows } = await client.query(query);
+      return rows;
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to get shopping cart id');
+    }
+  },
+
+
+
   // Get all shopping cart items by cart_id
   async getItemsByCartId(cart_id) {
     try {
@@ -1055,12 +1073,12 @@ const ShoppingCartItemModel = {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Define Order model
 const OrderModel = {
-  async checkout(customer_id, cart_id) {
+  async checkout(customer_id, cart_id, shipping_method) {
     try {
       // Insert new order
       const insertOrderQuery = {
-        text: 'INSERT INTO orders(customer_id, creationdate, status, deliverydate) VALUES($1, NOW(), $2, NULL) RETURNING *',
-        values: [customer_id, 'pending'],
+        text: 'INSERT INTO orders(customer_id, creationdate, status, deliverydate, shipping_method) VALUES($1, NOW(), $2, NULL, $3) RETURNING *',
+        values: [customer_id, 'pending', shipping_method],
       };
       const newOrder = await client.query(insertOrderQuery);
 
@@ -1095,8 +1113,8 @@ const OrderModel = {
     try {
       // Insert new order
       const insertQuery = {
-        text: 'INSERT INTO orders(creationdate, status, deliverydate) VALUES($1, $2, $3) RETURNING *',
-        values: [order.creationdate, order.status, order.deliverydate],
+        text: 'INSERT INTO orders(creationdate, status, deliverydate, shipping_method) VALUES($1, $2, $3, $4) RETURNING *',
+        values: [order.creationdate, order.status, order.deliverydate, order.shipping_method],
       };
       const result = await client.query(insertQuery);
       console.log(result);
@@ -1191,11 +1209,12 @@ const OrderModel = {
   
       // Update the order fields with the new values, or keep the old value if the field is not provided
       const updateQuery = {
-        text: 'UPDATE orders SET creationdate = $1, status = $2, deliverydate = $3 WHERE order_id = $4 RETURNING *',
+        text: 'UPDATE orders SET creationdate = $1, status = $2, deliverydate = $3, shipping_method = $4 WHERE order_id = $5 RETURNING *',
         values: [
           updateFields.creationdate || order.rows[0].creationdate,
           updateFields.status || order.rows[0].status,
           updateFields.deliverydate || order.rows[0].deliverydate,
+          updateFields.shipping_method || order.rows[0].shipping_method,
           order_id,
         ],
       };
@@ -1328,9 +1347,16 @@ app.post('/register', async (req, res) => {
       throw new Error('Could not find user.');
     }
 
+    // Set session cookie
+    req.session.user = { customer_id: customer_id, email: user.email };
+    req.session.authenticated = true;
+
+    // Create a shopping cart for the customer
+    const shoppingCart = await ShoppingCartModel.createShoppingCart(customer_id);
+    
     // Return success response
     console.log('Registration successful '+ customer_id + " " + user.email);
-    res.status(200).json({ message: 'User created successfully', customer_id: customer_id, email: user.email});
+    res.status(200).json({ message: 'User created successfully', customer_id: customer_id, email: user.email, shopping_cart: shoppingCart});
   } catch (err) {
     // Handle errors
     console.error(err);
@@ -1367,7 +1393,7 @@ app.post('/login', async (req, res) => {
 
     // Create a shopping cart for the customer
     const shoppingCart = await ShoppingCartModel.createShoppingCart(user.customer_id);
-    
+
     // Return success response
     console.log('Login successful'+ ' this ' + req.sessionID);
     console.log(user.customer_id + ' ' + user.email)
@@ -1571,6 +1597,10 @@ app.post('/employeeCreate', async (req, res) => {
     // Create new employee
     const employee = { firstname, lastname, email, password };
     await EmployeeModel.createEmployee(employee);
+
+    // Set session cookie
+    req.session.employee = { firstname: employee.firstname, email: employee.email };
+    req.session.authenticated = true;
 
     // Return success response
     res.status(200).json({ message: 'Employee created successfully' });
@@ -1969,6 +1999,20 @@ app.patch('updateItemGroup', async (req, res) => {
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SHOPPING CART ITEMS STUFF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// End point for cart_id
+// Get shopping cart items cart_id
+app.get('/getCartID/:customer_id', async (req, res) => {
+  const { cart_id } = req.params;
+
+  try {
+    const items = await ShoppingCartItemModel.getCartID(customer_id);
+    res.json(items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to get shopping cart id');
+  }
+});
+
 // Define a GET endpoint that returns all shopping cart items for a given cart_id
 app.get('/getItemsByCartId/:cart_id', async (req, res) => {
   const { cart_id } = req.params;
@@ -2051,7 +2095,7 @@ app.put('/updateCartItemQuantity', async (req, res) => {
 app.post('/checkout', async (req, res) => {
   try {
 
-    const { customer_id } = req.body;
+    const { customer_id, shipping_method } = req.body;
 
     // FOR COOKIES
     // const customer_id = req.session.user.customer_id; // Get the customer_id from the session
@@ -2059,7 +2103,7 @@ app.post('/checkout', async (req, res) => {
     const { rows } = await client.query('SELECT id as cart_id FROM shopping_cart WHERE customer_id = $1', [customer_id]);
     const cart_id = rows[0].cart_id;
 
-    const newOrder = await OrderModel.checkout(customer_id, cart_id);
+    const newOrder = await OrderModel.checkout(customer_id, cart_id, shipping_method);
 
     res.json({ success: true, message: 'Order created successfully', order: newOrder });
   } catch (err) {

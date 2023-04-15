@@ -26,6 +26,7 @@ function DisplayInventory() {
             <th>Item Group</th>
             <th>Stock</th>
             <th>Image</th>
+            <th>Warehouse</th>
           </tr>
         </thead>
         <tbody>
@@ -39,6 +40,7 @@ function DisplayInventory() {
               <td>{item.itemgroup}</td>
               <td>{item.stock}</td>
               <td>{item.image}</td>
+              <td>{item.warehouse}</td>
             </tr>
           ))}
         </tbody>

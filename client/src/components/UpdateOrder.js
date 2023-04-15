@@ -8,7 +8,8 @@ class UpdateOrder extends Component {
       order_id: '',
       creationdate: '',
       status: '',
-      deliverydate: ''
+      deliverydate: '',
+      shipping_method: ''
     };
   }
 
@@ -19,11 +20,12 @@ class UpdateOrder extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { order_id, creationdate, status, deliverydate } = this.state;
+    const { order_id, creationdate, status, deliverydate, shipping_method } = this.state;
     axios.put(`/updateOrder/${order_id}`, {
       creationdate,
       status,
-      deliverydate
+      deliverydate,
+      shipping_method
     })
       .then((response) => {
         console.log(response.data);
@@ -34,7 +36,7 @@ class UpdateOrder extends Component {
   };
 
   render() {
-    const { order_id, creationdate, status, deliverydate } = this.state;
+    const { order_id, creationdate, status, deliverydate, shipping_method} = this.state;
     return (
       <div>
         <h2>Update Order</h2>
@@ -57,6 +59,11 @@ class UpdateOrder extends Component {
           <label>
             Delivery Date:
             <input type="text" name="deliverydate" value={deliverydate} onChange={this.handleInputChange} />
+          </label>
+          <br />
+          <label>
+            Shipping Method:
+            <input type="text" name="shipping_method" value={shipping_method} onChange={this.handleInputChange} />
           </label>
           <br />
           <button type="submit">Update Order</button>

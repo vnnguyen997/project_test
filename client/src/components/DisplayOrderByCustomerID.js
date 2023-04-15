@@ -34,6 +34,7 @@ function DisplayOrderByCustomerID() {
             <th>Status</th>
             <th>Delivery Date</th>
             <th>Customer ID</th>
+            <th>Shipping_method</th>
           </tr>
         </thead>
         <tbody>
@@ -44,6 +45,7 @@ function DisplayOrderByCustomerID() {
               <td>{order.status}</td>
               <td>{order.deliverydate}</td>
               <td>{order.customer_id}</td>
+              <td>{order.shipping_method}</td>
             </tr>
           ))}
         </tbody>
