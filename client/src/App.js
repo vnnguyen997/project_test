@@ -24,6 +24,9 @@ import CheckoutButton from './components/CheckoutButton';
 import DisplayShoppingCartItems from './components/DisplayShoppingCartItems';
 import DisplayOrderByCustomerID from './components/DisplayOrderByCustomerID';
 import DisplayOrderItems from './components/DisplayOrderItems';
+import DisplayItemByItemID from './components/DisplayItemByItemID';
+import DisplayOrdersAndItemsByCustomerID from './components/DisplayOrdersAndItemsByCustomerID';
+
 
 
 const App = () => {
@@ -53,6 +56,8 @@ const App = () => {
       <DisplayShoppingCartItems />
       <DisplayOrderByCustomerID />
       <DisplayOrderItems />
+      <DisplayItemByItemID />
+      <DisplayOrdersAndItemsByCustomerID />
 
     
     </div>

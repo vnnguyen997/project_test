@@ -29,26 +29,34 @@ function DisplayShoppingCartItems() {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Cart ID</th>
             <th>Inventory ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Weight</th>
+            <th>Price</th>
+            <th>Item Group</th>
+            <th>Stock</th>
+            <th>Image</th>
+            <th>Warehouse</th>
             <th>Quantity</th>
             <th>Price</th>
-            <th>Created At</th>
-            <th>Modified At</th>
             <th>Total Price</th>
           </tr>
         </thead>
         <tbody>
           {items.map((item) => (
             <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.cart_id}</td>
               <td>{item.inventory_id}</td>
+              <td>{item.name}</td>
+              <td>{item.description}</td>
+              <td>{item.weight}</td>
+              <td>{item.price}</td>
+              <td>{item.itemgroup}</td>
+              <td>{item.stock}</td>
+              <td>{item.image}</td>
+              <td>{item.warehouse}</td>
               <td>{item.quantity}</td>
               <td>{item.price}</td>
-              <td>{item.created_at}</td>
-              <td>{item.modified_at}</td>
               <td>{item.totalprice}</td>
             </tr>
           ))}
