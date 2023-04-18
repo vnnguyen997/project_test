@@ -1226,7 +1226,8 @@ const OrderModel = {
         oi.quantity, 
         oi.price, 
         oi.total_price,
-        i.name
+        i.name,
+        i.warehouse
         FROM 
           orders o
           JOIN order_items oi ON o.order_id = oi.order_id
@@ -1247,7 +1248,23 @@ const OrderModel = {
   async displayOrders() {
     // Define the SELECT query to retrieve all rows from the "orders" table
     const query = {
-      text: 'SELECT * FROM orders',
+      text: `SELECT 
+      o.order_id, 
+      o.creationdate, 
+      o.status, 
+      o.deliverydate,
+      o.shipping_method,
+      o.customer_id,
+      oi.inventory_id, 
+      oi.quantity, 
+      oi.price, 
+      oi.total_price,
+      i.name,
+      i.warehouse
+      FROM 
+        orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN inventory i ON oi.inventory_id = i.inventory_id`,
     };
   
     // Execute 
@@ -2259,16 +2276,10 @@ app.get('/getOrdersAndItemsByCustomerId/:customer_id', async (req, res) => {
 // Endpoint to display orders
 app.get('/displayOrders', async (req, res) => {
   try {
-    // Define the SELECT query to retrieve all rows from the "orders" table
-    const query = {
-      text: 'SELECT * FROM orders',
-    };
-  
-    // Execute the query using the database client
-    const { rows } = await client.query(query);
 
+    const orders = await OrderModel.displayOrders();
     // Return the retrieved rows as a JSON response
-    res.json(rows);
+    res.json(orders);
   } catch (error) {
     // Handle any errors that occurred during the query or response
     console.error(error);

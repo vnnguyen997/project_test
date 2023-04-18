@@ -22,8 +22,14 @@ function DisplayOrders() {
             <th>Creation Date</th>
             <th>Status</th>
             <th>Delivery Date</th>
-            <th>Customer ID</th>
             <th>Shipping Method</th>
+            <th>Customer ID</th>
+            <th>Inventory ID</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Price</th>
+            <th>Name</th>
+            <th>Warehouse</th>
           </tr>
         </thead>
         <tbody>
@@ -33,8 +39,15 @@ function DisplayOrders() {
               <td>{order.creationdate}</td>
               <td>{order.status}</td>
               <td>{order.deliverydate}</td>
-              <td>{order.customer_id}</td>
               <td>{order.shipping_method}</td>
+              <td>{order.customer_id}</td>
+              <td>{order.inventory_id}</td>
+              <td>{order.quantity}</td>
+              <td>{order.price}</td>
+              <td>{order.total_price}</td>
+              <td>{order.name}</td>
+              <td>{order.warehouse}</td>
+
             </tr>
           ))}
         </tbody>

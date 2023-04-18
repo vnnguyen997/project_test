@@ -26,6 +26,8 @@ import DisplayOrderByCustomerID from './components/DisplayOrderByCustomerID';
 import DisplayOrderItems from './components/DisplayOrderItems';
 import DisplayItemByItemID from './components/DisplayItemByItemID';
 import DisplayOrdersAndItemsByCustomerID from './components/DisplayOrdersAndItemsByCustomerID';
+import BulkAddToCart from './components/BulkAddToCart';
+import DisplayOrders from './components/DisplayOrders';
 
 
 
@@ -50,9 +52,11 @@ const App = () => {
       <RemoveInventory />
       <RemoveOrder />
       <AddToCart />
+      <BulkAddToCart />
       <RemoveCartItem />
       <UpdateCartItemQuantity />
       <CheckoutButton />
+      <DisplayOrders />
       <DisplayShoppingCartItems />
       <DisplayOrderByCustomerID />
       <DisplayOrderItems />
