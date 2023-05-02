@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { Client } = require('pg');
 const cors = require("cors");
 const session = require('express-session');
@@ -803,24 +803,25 @@ const InventoryModel = {
     }
   },
 
-  // get item stock
-  async getInventoryStock(itemid) {
-    try {
-      const query = {
-        text: 'SELECT stock FROM inventory WHERE itemid = $1',
-        values: [itemid],
-      };
-      const { rows } = await client.query(query);
-      if (rows.length > 0) {
-        return rows[0].stock;
-      } else {
-        throw new Error('Inventory item not found');
-      }
-    } catch (err) {
-      console.error(err);
-      throw new Error('Failed to get inventory stock');
-    }
+  async getCustID(email) {
+    const query = {
+      text: 'SELECT customer_id FROM customer WHERE email = $1',
+      values: [email],
+    };
+    const { rows } = await client.query(query);
+    return rows[0].customer_id;
   },
+
+  // get item stock
+  async getInventoryStock(inventory_id) {
+    const query = {
+      text: 'SELECT stock FROM inventory WHERE inventory_id = $1',
+      values: [inventory_id],
+    };
+    const { rows } = await client.query(query);
+    return rows[0].stock;
+  },
+  
 
   // update name
   async updateName(itemId, name) {
@@ -903,11 +904,11 @@ const InventoryModel = {
   },
 
   // update stock
-  async updateStock(itemId, stock) {
+  async updateStock(inventory_id, stock) {
     try {
       const updateQuery = {
         text: 'UPDATE inventory SET stock = $1 WHERE inventory_id = $2 RETURNING *',
-        values: [stock, itemId],
+        values: [stock, inventory_id],
       };
       const { rows } = await client.query(updateQuery);
       console.log(rows[0]);
@@ -1175,6 +1176,7 @@ const OrderModel = {
         values: [customer_id, 'pending', shipping_method],
       };
       const newOrder = await client.query(insertOrderQuery);
+      console.log(newOrder);
 
       console.log("order created");
   
@@ -1183,10 +1185,24 @@ const OrderModel = {
         text: `INSERT INTO order_items(order_id, inventory_id, quantity, price, total_price)
                SELECT $1, sci.inventory_id, sci.quantity, sci.price, sci.totalprice
                FROM shopping_cart_items sci
-               WHERE sci.cart_id = $2`,
+               WHERE sci.cart_id = $2
+               RETURNING order_id, inventory_id, quantity`,
         values: [newOrder.rows[0].order_id, cart_id],
       };
-      await client.query(insertOrderItemsQuery);
+      const orderItems = await client.query(insertOrderItemsQuery);
+
+      console.log(orderItems);
+
+      // Update the stock in the inventory table
+      for (const orderItem of orderItems.rows) {
+        const updateStockQuery = {
+          text: 'UPDATE inventory SET stock = stock - $1 WHERE inventory_id = $2',
+          values: [orderItem.quantity, orderItem.inventory_id],
+        };
+        console.log(orderItem.quantity, orderItem.inventory_id);
+        await client.query(updateStockQuery);
+
+      }
   
       // Clear shopping cart
       const deleteShoppingCartItemsQuery = {
@@ -2081,8 +2097,8 @@ app.get('/getInventoryItemGroup', async (req, res) => {
 // Endpoint to get inventory stock
 app.get('/getInventoryStock', async (req, res) => {
   try {
-    const { itemid } = req.query;
-    const stock = await getInventoryStock(itemid);
+    const { inventory_id } = req.query;
+    const stock = await InventoryModel.getInventoryStock(inventory_id);
     res.status(200).json({ stock });
   } catch (err) {
     console.error(err);
@@ -2152,6 +2168,20 @@ app.patch('updateItemGroup', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/updateStock/:inventory_id', async (req, res) => {
+  try {
+    const inventory_id = req.params.inventory_id;
+    const stock = req.body.stock;
+    
+    const updatedItem = await InventoryModel.updateStock(inventory_id, stock);
+    
+    res.json(updatedItem);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update stock' });
   }
 });
 

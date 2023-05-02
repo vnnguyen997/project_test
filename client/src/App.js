@@ -28,6 +28,7 @@ import DisplayItemByItemID from './components/DisplayItemByItemID';
 import DisplayOrdersAndItemsByCustomerID from './components/DisplayOrdersAndItemsByCustomerID';
 import BulkAddToCart from './components/BulkAddToCart';
 import DisplayOrders from './components/DisplayOrders';
+import UpdateStock from './components/UpdateStock';
 
 
 
@@ -62,6 +63,7 @@ const App = () => {
       <DisplayOrderItems />
       <DisplayItemByItemID />
       <DisplayOrdersAndItemsByCustomerID />
+      <UpdateStock />
 
     
     </div>
